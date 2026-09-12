@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CompiLearn - Educational Compiler Construction IDE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="brand-logo">
+          <span class="logo-icon">⚡</span>
+          <div class="brand-text">
+            <span class="brand-name">CompiLearn</span>
+            <span class="brand-tagline">Educational Compiler Construction Platform</span>
+          </div>
+        </div>
+        <div class="compiler-status-badge" id="compilerStatusBadge">
+          <span class="status-dot"></span>
+          <span id="compilerStatusText">MSYS2 GCC/Flex/Bison Ready</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <!-- Quick Action Bar -->
+        <button id="btnCompileAll" class="btn btn-primary" title="Run full compiler pipeline and execute on VM">
+          <span class="btn-icon">▶</span> Compile All (Pipeline)
+        </button>
+        <button id="btnRunVM" class="btn btn-success" title="Execute bytecode on the Stack VM">
+          <span class="btn-icon">⚡</span> Run VM
+        </button>
+        <div class="phase-selector-container">
+          <select id="phaseSelect" class="dropdown-select">
+            <option value="all">Phase: Full Pipeline</option>
+            <option value="lex">1. Lexical Analysis</option>
+            <option value="tokens">2. Token Stream View</option>
+            <option value="parse">3. Syntax Analysis</option>
+            <option value="tree">4. Concrete Parse Tree</option>
+            <option value="ast">5. Abstract Syntax Tree</option>
+            <option value="symbols">6. Symbol Table</option>
+            <option value="semantic">7. Semantic Analysis</option>
+            <option value="tac">8. Three Address Code</option>
+            <option value="optimize">9. Optimization Report</option>
+            <option value="stack">10. Stack Code</option>
+            <option value="run">11. Execute on VM</option>
+          </select>
+          <button id="btnRunPhase" class="btn btn-secondary">Run Phase</button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button id="btnResetCode" class="btn btn-ghost" title="Reset to original example code">↺ Reset</button>
+        <button id="btnClearEditor" class="btn btn-ghost" title="Clear editor content">🗑 Clear</button>
+        <button id="themeToggleBtn" class="btn btn-icon-only" title="Toggle Dark / Light theme">
+          <span id="themeIcon">☀️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Visual Compiler Pipeline Ribbon -->
+    <section class="pipeline-ribbon">
+      <div class="pipeline-title">
+        <span class="pipeline-label">COMPILER PIPELINE</span>
+        <span class="pipeline-sub">Click any stage to inspect output</span>
+      </div>
+      <div class="pipeline-track" id="pipelineTrack">
+        <!-- Stages generated dynamically or static -->
+        <div class="pipeline-step active" data-tab="tab-overview" id="step-source">
+          <div class="step-badge">1</div>
+          <div class="step-info">
+            <div class="step-name">Source Code</div>
+            <div class="step-status" id="status-source">Loaded</div>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step" data-tab="tab-tokens" id="step-lexical">
+          <div class="step-badge">2</div>
+          <div class="step-info">
+            <div class="step-name">Lexical (Flex)</div>
+            <div class="step-status" id="status-lexical">Idle</div>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step" data-tab="tab-parsetree" id="step-syntax">
+          <div class="step-badge">3</div>
+          <div class="step-info">
+            <div class="step-name">Syntax (Bison)</div>
+            <div class="step-status" id="status-syntax">Idle</div>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step" data-tab="tab-ast" id="step-ast">
+          <div class="step-badge">4</div>
+          <div class="step-info">
+            <div class="step-name">AST Node</div>
+            <div class="step-status" id="status-ast">Idle</div>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step" data-tab="tab-symbols" id="step-symbols">
+          <div class="step-badge">5</div>
+          <div class="step-info">
+            <div class="step-name">Symbol Table</div>
+            <div class="step-status" id="status-symbols">Idle</div>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step" data-tab="tab-semantic" id="step-semantic">
+          <div class="step-badge">6</div>
+          <div class="step-info">
+            <div class="step-name">Semantic Check</div>
+            <div class="step-status" id="status-semantic">Idle</div>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step" data-tab="tab-tac" id="step-tac">
+          <div class="step-badge">7</div>
+          <div class="step-info">
+            <div class="step-name">Three Address Code</div>
+            <div class="step-status" id="status-tac">Idle</div>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step" data-tab="tab-optimize" id="step-optimize">
+          <div class="step-badge">8</div>
+          <div class="step-info">
+            <div class="step-name">Optimization</div>
+            <div class="step-status" id="status-optimize">Idle</div>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step" data-tab="tab-stack" id="step-stack">
+          <div class="step-badge">9</div>
+          <div class="step-info">
+            <div class="step-name">Stack Code</div>
+            <div class="step-status" id="status-stack">Idle</div>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step" data-tab="tab-output" id="step-execution">
+          <div class="step-badge">10</div>
+          <div class="step-info">
+            <div class="step-name">Stack VM Run</div>
+            <div class="step-status" id="status-execution">Idle</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace: Sidebar + Editor + Output Panels -->
+    <main class="main-layout">
+      <!-- Left Sidebar: Examples & File Operations -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-title">EXAMPLES & FILES</span>
+          <button id="btnNewFile" class="btn-sm btn-outline">+ New File</button>
+        </div>
+
+        <div class="examples-list" id="examplesList">
+          <!-- Dynamic populated from backend -->
+          <div class="loading-spinner">Loading examples...</div>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="compiler-info-card">
+            <div class="info-row">
+              <span class="info-key">Engine:</span>
+              <span class="info-val">C11 / Flex / Bison</span>
+            </div>
+            <div class="info-row">
+              <span class="info-key">Target:</span>
+              <span class="info-val">Stack VM Bytecode</span>
+            </div>
+            <div class="info-row">
+              <span class="info-key">MSYS2:</span>
+              <span class="info-val">UCRT64 GCC 16.2</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center Panel: Code Editor -->
+      <section class="editor-section">
+        <div class="editor-tabs-bar">
+          <div class="active-file-tab">
+            <span class="file-icon">📄</span>
+            <span id="currentFileName">01_declarations.cl</span>
+            <span class="modified-dot" id="fileModifiedDot" style="display: none;">●</span>
+          </div>
+          <div class="editor-meta">
+            <span id="cursorPos">Line 1, Col 1</span>
+            <span id="charCount">0 chars</span>
+          </div>
+        </div>
+
+        <div class="editor-container">
+          <div class="line-numbers" id="lineNumbers">1</div>
+          <textarea id="codeEditor" class="code-textarea" spellcheck="false" placeholder="// Write or load CompiLearn source code (.cl)..."></textarea>
+        </div>
+      </section>
+
+      <!-- Right/Bottom Panel: Output Tabs -->
+      <section class="output-section">
+        <div class="output-tabs-bar" id="outputTabsBar">
+          <button class="output-tab active" data-tab="tab-overview">Overview</button>
+          <button class="output-tab" data-tab="tab-tokens">Tokens</button>
+          <button class="output-tab" data-tab="tab-parsetree">Parse Tree</button>
+          <button class="output-tab" data-tab="tab-ast">AST</button>
+          <button class="output-tab" data-tab="tab-symbols">Symbols</button>
+          <button class="output-tab" data-tab="tab-semantic">Semantics</button>
+          <button class="output-tab" data-tab="tab-tac">TAC</button>
+          <button class="output-tab" data-tab="tab-optimize">Optimized TAC</button>
+          <button class="output-tab" data-tab="tab-stack">Stack Code</button>
+          <button class="output-tab" data-tab="tab-output">VM Output</button>
+          <button class="output-tab" data-tab="tab-raw">CLI Console</button>
+        </div>
+
+        <div class="output-content-container">
+          <!-- Tab 1: Overview Cards -->
+          <div class="tab-pane active" id="tab-overview">
+            <div class="overview-grid" id="overviewGrid">
+              <div class="overview-welcome">
+                <h3>Welcome to CompiLearn IDE</h3>
+                <p>Select an example from the left sidebar or write your own program, then click <strong>Compile All</strong> above to visualize every compiler stage from lexical tokenization to virtual machine execution.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Tokens Table -->
+          <div class="tab-pane" id="tab-tokens">
+            <div class="panel-toolbar">
+              <input type="text" id="tokenFilterInput" class="filter-input" placeholder="Filter tokens by type or lexeme...">
+              <span class="badge" id="tokenCountBadge">0 tokens</span>
+              <button class="btn-sm btn-ghost" id="copyTokensBtn">Copy Table</button>
+            </div>
+            <div class="table-scroll-container">
+              <table class="data-table" id="tokensTable">
+                <thead>
+                  <tr>
+                    <th>Line</th>
+                    <th>Column</th>
+                    <th>Token Type</th>
+                    <th>Lexeme</th>
+                  </tr>
+                </thead>
+                <tbody id="tokensTableBody">
+                  <tr><td colspan="4" class="empty-state">No tokens scanned yet. Run Lexical Analysis.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab 3: Concrete Parse Tree -->
+          <div class="tab-pane" id="tab-parsetree">
+            <div class="panel-toolbar">
+              <span class="panel-title">Concrete Syntax Tree (Bison Grammar Derivation)</span>
+              <button class="btn-sm btn-ghost" id="copyParseTreeBtn">Copy Tree</button>
+            </div>
+            <pre class="code-pre tree-pre" id="parseTreeOutput">(Parse tree not generated yet. Click 'Parse' or 'Compile All'.)</pre>
+          </div>
+
+          <!-- Tab 4: AST -->
+          <div class="tab-pane" id="tab-ast">
+            <div class="panel-toolbar">
+              <span class="panel-title">Abstract Syntax Tree (Semantic Structure)</span>
+              <button class="btn-sm btn-ghost" id="copyAstBtn">Copy AST</button>
+            </div>
+            <pre class="code-pre tree-pre" id="astOutput">(AST not generated yet. Click 'Compile All'.)</pre>
+          </div>
+
+          <!-- Tab 5: Symbol Table -->
+          <div class="tab-pane" id="tab-symbols">
+            <div class="panel-toolbar">
+              <span class="panel-title">Scoped Symbol Table (Identifiers & Virtual Addresses)</span>
+              <span class="badge" id="symbolCountBadge">0 symbols</span>
+              <button class="btn-sm btn-ghost" id="copySymbolsBtn">Copy Symbols</button>
+            </div>
+            <div class="table-scroll-container">
+              <table class="data-table" id="symbolsTable">
+                <thead>
+                  <tr>
+                    <th>Variable Name</th>
+                    <th>Type</th>
+                    <th>Scope</th>
+                    <th>Memory Address</th>
+                    <th>Decl Line</th>
+                  </tr>
+                </thead>
+                <tbody id="symbolsTableBody">
+                  <tr><td colspan="5" class="empty-state">Symbol table empty. Run Semantic Analysis.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab 6: Semantic Analysis -->
+          <div class="tab-pane" id="tab-semantic">
+            <div class="panel-toolbar">
+              <span class="panel-title">Semantic Validation & Type Checking</span>
+              <span class="status-pill" id="semanticStatusPill">Pending</span>
+            </div>
+            <div class="semantic-report-container" id="semanticReportContainer">
+              <div class="empty-state">Run Semantic Analysis to detect redeclarations, undeclared variables, or type mismatches.</div>
+            </div>
+          </div>
+
+          <!-- Tab 7: Three Address Code (TAC) -->
+          <div class="tab-pane" id="tab-tac">
+            <div class="panel-toolbar">
+              <span class="panel-title">Three Address Code (Linearized Quadruples)</span>
+              <button class="btn-sm btn-ghost" id="copyTacBtn">Copy TAC</button>
+            </div>
+            <pre class="code-pre tac-pre" id="tacOutput">(TAC not generated yet. Click 'Generate TAC'.)</pre>
+          </div>
+
+          <!-- Tab 8: Optimized TAC -->
+          <div class="tab-pane" id="tab-optimize">
+            <div class="panel-toolbar">
+              <span class="panel-title">Optimized TAC (Constant Folding, Propagation & Dead Code Elimination)</span>
+              <button class="btn-sm btn-ghost" id="copyOptBtn">Copy Report</button>
+            </div>
+            <pre class="code-pre tac-pre" id="optTacOutput">(Optimization not run yet. Click 'Optimize Code'.)</pre>
+          </div>
+
+          <!-- Tab 9: Stack Machine Code -->
+          <div class="tab-pane" id="tab-stack">
+            <div class="panel-toolbar">
+              <span class="panel-title">Stack Machine Bytecode Assembly</span>
+              <button class="btn-sm btn-ghost" id="copyStackBtn">Copy Bytecode</button>
+            </div>
+            <pre class="code-pre bytecode-pre" id="stackCodeOutput">(Stack bytecode not generated yet.)</pre>
+          </div>
+
+          <!-- Tab 10: Stack VM Program Output -->
+          <div class="tab-pane" id="tab-output">
+            <div class="panel-toolbar">
+              <span class="panel-title">Live Execution Console (Stack Virtual Machine)</span>
+              <span class="badge badge-success" id="vmStatusBadge">Ready</span>
+              <button class="btn-sm btn-ghost" id="copyVmOutputBtn">Copy Output</button>
+            </div>
+            <pre class="code-pre terminal-pre" id="vmOutputConsole">Program output will be displayed here when compiled and executed on the Stack VM.</pre>
+          </div>
+
+          <!-- Tab 11: Raw CLI Console Output -->
+          <div class="tab-pane" id="tab-raw">
+            <div class="panel-toolbar">
+              <span class="panel-title">Raw Compiler Output (compilearn.exe CLI)</span>
+              <button class="btn-sm btn-ghost" id="copyRawBtn">Copy Raw</button>
+            </div>
+            <pre class="code-pre terminal-pre" id="rawCliConsole">Raw stdout/stderr from compilearn.exe will appear here.</pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
