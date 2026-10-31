@@ -43,7 +43,7 @@ static void print_pt_recursive(ParseTreeNode *node, const char *prefix, bool is_
         printf("\033[1;32m<%s>\033[0m (line %d)\n", node->name, node->line);
     }
 
-    char new_prefix[512];
+    char new_prefix[2048];
     snprintf(new_prefix, sizeof(new_prefix), "%s%s", prefix, is_last ? "    " : "│   ");
 
     for (int i = 0; i < node->child_count; i++) {
@@ -329,7 +329,7 @@ static void print_ast_recursive(ASTNode *node, const char *prefix, bool is_last,
             break;
     }
 
-    char new_prefix[512];
+    char new_prefix[2048];
     snprintf(new_prefix, sizeof(new_prefix), "%s%s", prefix, is_last ? "    " : "│   ");
 
     /* Collect all child subtrees to print sequentially */

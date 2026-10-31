@@ -559,12 +559,12 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    69,    69,    77,    84,    91,   100,   101,   102,   103,
-     104,   105,   106,   107,   112,   122,   127,   132,   137,   145,
-     153,   166,   178,   185,   196,   206,   219,   223,   232,   244,
-     248,   256,   260,   271,   280,   286,   294,   300,   306,   312,
-     318,   324,   330,   336,   342,   348,   354,   360,   366,   372,
-     378,   384,   390,   396,   402,   408,   414,   419
+       0,    69,    69,    77,    84,    94,   103,   104,   105,   106,
+     107,   108,   109,   110,   115,   125,   130,   135,   140,   148,
+     157,   171,   184,   194,   209,   222,   240,   244,   254,   267,
+     271,   279,   283,   295,   306,   314,   324,   332,   340,   348,
+     356,   364,   372,   380,   388,   396,   404,   412,   420,   428,
+     435,   442,   450,   456,   462,   468,   474,   479
 };
 #endif
 
@@ -1260,528 +1260,588 @@ yyreduce:
 #line 85 "parser.y"
     {
         (yyval.sem).ast = ast_append_stmt((yyvsp[-1].sem).ast, (yyvsp[0].sem).ast);
-        (yyval.sem).pt = pt_create_node("StmtList", NULL, yylineno);
-        if ((yyvsp[-1].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        if ((yyvsp[-1].sem).pt) {
+            (yyval.sem).pt = (yyvsp[-1].sem).pt;
+        } else {
+            (yyval.sem).pt = pt_create_node("StmtList", NULL, yylineno);
+        }
         if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
-#line 1268 "parser.tab.c"
+#line 1271 "parser.tab.c"
     break;
 
   case 5: /* stmt_list: stmt  */
-#line 92 "parser.y"
+#line 95 "parser.y"
     {
         (yyval.sem).ast = (yyvsp[0].sem).ast;
         (yyval.sem).pt = pt_create_node("StmtList", NULL, yylineno);
         if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
-#line 1278 "parser.tab.c"
+#line 1281 "parser.tab.c"
     break;
 
   case 6: /* stmt: var_decl  */
-#line 100 "parser.y"
+#line 103 "parser.y"
                        { (yyval.sem) = (yyvsp[0].sem); }
-#line 1284 "parser.tab.c"
+#line 1287 "parser.tab.c"
     break;
 
   case 7: /* stmt: assign_stmt  */
-#line 101 "parser.y"
+#line 104 "parser.y"
                        { (yyval.sem) = (yyvsp[0].sem); }
-#line 1290 "parser.tab.c"
+#line 1293 "parser.tab.c"
     break;
 
   case 8: /* stmt: if_stmt  */
-#line 102 "parser.y"
+#line 105 "parser.y"
                        { (yyval.sem) = (yyvsp[0].sem); }
-#line 1296 "parser.tab.c"
+#line 1299 "parser.tab.c"
     break;
 
   case 9: /* stmt: while_stmt  */
-#line 103 "parser.y"
+#line 106 "parser.y"
                        { (yyval.sem) = (yyvsp[0].sem); }
-#line 1302 "parser.tab.c"
+#line 1305 "parser.tab.c"
     break;
 
   case 10: /* stmt: for_stmt  */
-#line 104 "parser.y"
+#line 107 "parser.y"
                        { (yyval.sem) = (yyvsp[0].sem); }
-#line 1308 "parser.tab.c"
+#line 1311 "parser.tab.c"
     break;
 
   case 11: /* stmt: print_stmt  */
-#line 105 "parser.y"
+#line 108 "parser.y"
                        { (yyval.sem) = (yyvsp[0].sem); }
-#line 1314 "parser.tab.c"
+#line 1317 "parser.tab.c"
     break;
 
   case 12: /* stmt: block  */
-#line 106 "parser.y"
+#line 109 "parser.y"
                        { (yyval.sem) = (yyvsp[0].sem); }
-#line 1320 "parser.tab.c"
+#line 1323 "parser.tab.c"
     break;
 
   case 13: /* stmt: TOKEN_SEMICOLON  */
-#line 108 "parser.y"
+#line 111 "parser.y"
     {
         (yyval.sem).ast = NULL;
         (yyval.sem).pt = pt_create_node("EmptyStmt", ";", yylineno);
     }
-#line 1329 "parser.tab.c"
+#line 1332 "parser.tab.c"
     break;
 
   case 14: /* stmt: error TOKEN_SEMICOLON  */
-#line 113 "parser.y"
+#line 116 "parser.y"
     {
         syntax_error_count++;
         (yyval.sem).ast = NULL;
         (yyval.sem).pt = pt_create_node("SyntaxError", "Recovered", yylineno);
         yyerrok;
     }
-#line 1340 "parser.tab.c"
+#line 1343 "parser.tab.c"
     break;
 
   case 15: /* type_spec: TOKEN_INT  */
-#line 123 "parser.y"
+#line 126 "parser.y"
     {
         (yyval.type_info).data_type = DATA_TYPE_INT;
         (yyval.type_info).pt = pt_create_node("TypeSpec", "int", yylineno);
     }
-#line 1349 "parser.tab.c"
+#line 1352 "parser.tab.c"
     break;
 
   case 16: /* type_spec: TOKEN_FLOAT  */
-#line 128 "parser.y"
+#line 131 "parser.y"
     {
         (yyval.type_info).data_type = DATA_TYPE_FLOAT;
         (yyval.type_info).pt = pt_create_node("TypeSpec", "float", yylineno);
     }
-#line 1358 "parser.tab.c"
+#line 1361 "parser.tab.c"
     break;
 
   case 17: /* type_spec: TOKEN_STRING  */
-#line 133 "parser.y"
+#line 136 "parser.y"
     {
         (yyval.type_info).data_type = DATA_TYPE_STRING;
         (yyval.type_info).pt = pt_create_node("TypeSpec", "string", yylineno);
     }
-#line 1367 "parser.tab.c"
+#line 1370 "parser.tab.c"
     break;
 
   case 18: /* type_spec: TOKEN_BOOL  */
-#line 138 "parser.y"
+#line 141 "parser.y"
     {
         (yyval.type_info).data_type = DATA_TYPE_BOOL;
         (yyval.type_info).pt = pt_create_node("TypeSpec", "bool", yylineno);
     }
-#line 1376 "parser.tab.c"
+#line 1379 "parser.tab.c"
     break;
 
   case 19: /* var_decl: type_spec TOKEN_IDENTIFIER TOKEN_SEMICOLON  */
-#line 146 "parser.y"
+#line 149 "parser.y"
     {
         (yyval.sem).ast = ast_create_var_decl((yyvsp[-2].type_info).data_type, (yyvsp[-1].str_val), NULL, yylineno);
-        (yyval.sem).pt = pt_create_node("VarDecl", (yyvsp[-1].str_val), yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].type_info).pt);
+        (yyval.sem).pt = pt_create_node("VarDecl", NULL, yylineno);
+        if ((yyvsp[-2].type_info).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].type_info).pt);
         pt_add_child((yyval.sem).pt, pt_create_node("Identifier", (yyvsp[-1].str_val), yylineno));
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ";", yylineno));
         free((yyvsp[-1].str_val));
     }
-#line 1388 "parser.tab.c"
+#line 1392 "parser.tab.c"
     break;
 
   case 20: /* var_decl: type_spec TOKEN_IDENTIFIER TOKEN_ASSIGN expr TOKEN_SEMICOLON  */
-#line 154 "parser.y"
+#line 158 "parser.y"
     {
         (yyval.sem).ast = ast_create_var_decl((yyvsp[-4].type_info).data_type, (yyvsp[-3].str_val), (yyvsp[-1].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("VarDeclInit", (yyvsp[-3].str_val), yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-4].type_info).pt);
+        (yyval.sem).pt = pt_create_node("VarDeclInit", NULL, yylineno);
+        if ((yyvsp[-4].type_info).pt) pt_add_child((yyval.sem).pt, (yyvsp[-4].type_info).pt);
         pt_add_child((yyval.sem).pt, pt_create_node("Identifier", (yyvsp[-3].str_val), yylineno));
         pt_add_child((yyval.sem).pt, pt_create_node("AssignOp", "=", yylineno));
-        pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        if ((yyvsp[-1].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ";", yylineno));
         free((yyvsp[-3].str_val));
     }
-#line 1402 "parser.tab.c"
+#line 1407 "parser.tab.c"
     break;
 
   case 21: /* assign_stmt: TOKEN_IDENTIFIER TOKEN_ASSIGN expr TOKEN_SEMICOLON  */
-#line 167 "parser.y"
+#line 172 "parser.y"
     {
         (yyval.sem).ast = ast_create_assign((yyvsp[-3].str_val), (yyvsp[-1].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("AssignStmt", (yyvsp[-3].str_val), yylineno);
+        (yyval.sem).pt = pt_create_node("AssignStmt", NULL, yylineno);
         pt_add_child((yyval.sem).pt, pt_create_node("Identifier", (yyvsp[-3].str_val), yylineno));
         pt_add_child((yyval.sem).pt, pt_create_node("AssignOp", "=", yylineno));
-        pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        if ((yyvsp[-1].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ";", yylineno));
         free((yyvsp[-3].str_val));
     }
-#line 1415 "parser.tab.c"
+#line 1421 "parser.tab.c"
     break;
 
   case 22: /* if_stmt: TOKEN_IF TOKEN_LPAREN expr TOKEN_RPAREN stmt  */
-#line 179 "parser.y"
+#line 185 "parser.y"
     {
         (yyval.sem).ast = ast_create_if((yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, NULL, yylineno);
         (yyval.sem).pt = pt_create_node("IfStmt", NULL, yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
-        pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Keyword", "if", yylineno));
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", "(", yylineno));
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ")", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
-#line 1426 "parser.tab.c"
+#line 1435 "parser.tab.c"
     break;
 
   case 23: /* if_stmt: TOKEN_IF TOKEN_LPAREN expr TOKEN_RPAREN stmt TOKEN_ELSE stmt  */
-#line 186 "parser.y"
+#line 195 "parser.y"
     {
         (yyval.sem).ast = ast_create_if((yyvsp[-4].sem).ast, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
         (yyval.sem).pt = pt_create_node("IfElseStmt", NULL, yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-4].sem).pt);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
-        pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Keyword", "if", yylineno));
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", "(", yylineno));
+        if ((yyvsp[-4].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-4].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ")", yylineno));
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Keyword", "else", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
-#line 1438 "parser.tab.c"
+#line 1451 "parser.tab.c"
     break;
 
   case 24: /* while_stmt: TOKEN_WHILE TOKEN_LPAREN expr TOKEN_RPAREN stmt  */
-#line 197 "parser.y"
+#line 210 "parser.y"
     {
         (yyval.sem).ast = ast_create_while((yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
         (yyval.sem).pt = pt_create_node("WhileStmt", NULL, yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
-        pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Keyword", "while", yylineno));
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", "(", yylineno));
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ")", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
-#line 1449 "parser.tab.c"
+#line 1465 "parser.tab.c"
     break;
 
   case 25: /* for_stmt: TOKEN_FOR TOKEN_LPAREN opt_for_init TOKEN_SEMICOLON opt_expr TOKEN_SEMICOLON opt_for_update TOKEN_RPAREN stmt  */
-#line 207 "parser.y"
+#line 223 "parser.y"
     {
         (yyval.sem).ast = ast_create_for((yyvsp[-6].sem).ast, (yyvsp[-4].sem).ast, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
         (yyval.sem).pt = pt_create_node("ForStmt", NULL, yylineno);
+        pt_add_child((yyval.sem).pt, pt_create_node("Keyword", "for", yylineno));
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", "(", yylineno));
         if ((yyvsp[-6].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-6].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ";", yylineno));
         if ((yyvsp[-4].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-4].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ";", yylineno));
         if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ")", yylineno));
         if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
-#line 1462 "parser.tab.c"
+#line 1483 "parser.tab.c"
     break;
 
   case 26: /* opt_for_init: %empty  */
-#line 219 "parser.y"
+#line 240 "parser.y"
     {
         (yyval.sem).ast = NULL;
         (yyval.sem).pt = NULL;
     }
-#line 1471 "parser.tab.c"
+#line 1492 "parser.tab.c"
     break;
 
   case 27: /* opt_for_init: type_spec TOKEN_IDENTIFIER TOKEN_ASSIGN expr  */
-#line 224 "parser.y"
+#line 245 "parser.y"
     {
         (yyval.sem).ast = ast_create_var_decl((yyvsp[-3].type_info).data_type, (yyvsp[-2].str_val), (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("ForInitDecl", (yyvsp[-2].str_val), yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-3].type_info).pt);
+        (yyval.sem).pt = pt_create_node("ForInitDecl", NULL, yylineno);
+        if ((yyvsp[-3].type_info).pt) pt_add_child((yyval.sem).pt, (yyvsp[-3].type_info).pt);
         pt_add_child((yyval.sem).pt, pt_create_node("Identifier", (yyvsp[-2].str_val), yylineno));
-        pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("AssignOp", "=", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
         free((yyvsp[-2].str_val));
     }
-#line 1484 "parser.tab.c"
+#line 1506 "parser.tab.c"
     break;
 
   case 28: /* opt_for_init: TOKEN_IDENTIFIER TOKEN_ASSIGN expr  */
-#line 233 "parser.y"
+#line 255 "parser.y"
     {
         (yyval.sem).ast = ast_create_assign((yyvsp[-2].str_val), (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("ForInitAssign", (yyvsp[-2].str_val), yylineno);
+        (yyval.sem).pt = pt_create_node("ForInitAssign", NULL, yylineno);
         pt_add_child((yyval.sem).pt, pt_create_node("Identifier", (yyvsp[-2].str_val), yylineno));
-        pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("AssignOp", "=", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
         free((yyvsp[-2].str_val));
     }
-#line 1496 "parser.tab.c"
+#line 1519 "parser.tab.c"
     break;
 
   case 29: /* opt_expr: %empty  */
-#line 244 "parser.y"
+#line 267 "parser.y"
     {
         (yyval.sem).ast = NULL;
         (yyval.sem).pt = NULL;
     }
-#line 1505 "parser.tab.c"
+#line 1528 "parser.tab.c"
     break;
 
   case 30: /* opt_expr: expr  */
-#line 249 "parser.y"
+#line 272 "parser.y"
     {
         (yyval.sem) = (yyvsp[0].sem);
     }
-#line 1513 "parser.tab.c"
+#line 1536 "parser.tab.c"
     break;
 
   case 31: /* opt_for_update: %empty  */
-#line 256 "parser.y"
+#line 279 "parser.y"
     {
         (yyval.sem).ast = NULL;
         (yyval.sem).pt = NULL;
     }
-#line 1522 "parser.tab.c"
+#line 1545 "parser.tab.c"
     break;
 
   case 32: /* opt_for_update: TOKEN_IDENTIFIER TOKEN_ASSIGN expr  */
-#line 261 "parser.y"
+#line 284 "parser.y"
     {
         (yyval.sem).ast = ast_create_assign((yyvsp[-2].str_val), (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("ForUpdateAssign", (yyvsp[-2].str_val), yylineno);
+        (yyval.sem).pt = pt_create_node("ForUpdateAssign", NULL, yylineno);
         pt_add_child((yyval.sem).pt, pt_create_node("Identifier", (yyvsp[-2].str_val), yylineno));
-        pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("AssignOp", "=", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
         free((yyvsp[-2].str_val));
     }
-#line 1534 "parser.tab.c"
+#line 1558 "parser.tab.c"
     break;
 
   case 33: /* print_stmt: TOKEN_PRINT expr TOKEN_SEMICOLON  */
-#line 272 "parser.y"
+#line 296 "parser.y"
     {
         (yyval.sem).ast = ast_create_print((yyvsp[-1].sem).ast, yylineno);
         (yyval.sem).pt = pt_create_node("PrintStmt", NULL, yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Keyword", "print", yylineno));
+        if ((yyvsp[-1].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ";", yylineno));
     }
-#line 1544 "parser.tab.c"
+#line 1570 "parser.tab.c"
     break;
 
   case 34: /* block: TOKEN_LBRACE stmt_list TOKEN_RBRACE  */
-#line 281 "parser.y"
+#line 307 "parser.y"
     {
         (yyval.sem).ast = ast_create_block((yyvsp[-1].sem).ast, yylineno);
         (yyval.sem).pt = pt_create_node("Block", NULL, yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", "{", yylineno));
+        if ((yyvsp[-1].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", "}", yylineno));
     }
-#line 1554 "parser.tab.c"
+#line 1582 "parser.tab.c"
     break;
 
   case 35: /* block: TOKEN_LBRACE TOKEN_RBRACE  */
-#line 287 "parser.y"
+#line 315 "parser.y"
     {
         (yyval.sem).ast = ast_create_block(NULL, yylineno);
-        (yyval.sem).pt = pt_create_node("EmptyBlock", "{}", yylineno);
-    }
-#line 1563 "parser.tab.c"
-    break;
-
-  case 36: /* expr: expr TOKEN_OR expr  */
-#line 295 "parser.y"
-    {
-        (yyval.sem).ast = ast_create_binary_op(OP_OR, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "||", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
-    }
-#line 1573 "parser.tab.c"
-    break;
-
-  case 37: /* expr: expr TOKEN_AND expr  */
-#line 301 "parser.y"
-    {
-        (yyval.sem).ast = ast_create_binary_op(OP_AND, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "&&", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
-    }
-#line 1583 "parser.tab.c"
-    break;
-
-  case 38: /* expr: expr TOKEN_EQ expr  */
-#line 307 "parser.y"
-    {
-        (yyval.sem).ast = ast_create_binary_op(OP_EQ, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "==", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        (yyval.sem).pt = pt_create_node("Block", NULL, yylineno);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", "{", yylineno));
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", "}", yylineno));
     }
 #line 1593 "parser.tab.c"
     break;
 
+  case 36: /* expr: expr TOKEN_OR expr  */
+#line 325 "parser.y"
+    {
+        (yyval.sem).ast = ast_create_binary_op(OP_OR, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "||", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+    }
+#line 1605 "parser.tab.c"
+    break;
+
+  case 37: /* expr: expr TOKEN_AND expr  */
+#line 333 "parser.y"
+    {
+        (yyval.sem).ast = ast_create_binary_op(OP_AND, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "&&", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+    }
+#line 1617 "parser.tab.c"
+    break;
+
+  case 38: /* expr: expr TOKEN_EQ expr  */
+#line 341 "parser.y"
+    {
+        (yyval.sem).ast = ast_create_binary_op(OP_EQ, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "==", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+    }
+#line 1629 "parser.tab.c"
+    break;
+
   case 39: /* expr: expr TOKEN_NEQ expr  */
-#line 313 "parser.y"
+#line 349 "parser.y"
     {
         (yyval.sem).ast = ast_create_binary_op(OP_NEQ, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "!=", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "!=", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
-#line 1603 "parser.tab.c"
+#line 1641 "parser.tab.c"
     break;
 
   case 40: /* expr: expr TOKEN_LT expr  */
-#line 319 "parser.y"
+#line 357 "parser.y"
     {
         (yyval.sem).ast = ast_create_binary_op(OP_LT, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "<", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
-    }
-#line 1613 "parser.tab.c"
-    break;
-
-  case 41: /* expr: expr TOKEN_LTE expr  */
-#line 325 "parser.y"
-    {
-        (yyval.sem).ast = ast_create_binary_op(OP_LTE, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "<=", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
-    }
-#line 1623 "parser.tab.c"
-    break;
-
-  case 42: /* expr: expr TOKEN_GT expr  */
-#line 331 "parser.y"
-    {
-        (yyval.sem).ast = ast_create_binary_op(OP_GT, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", ">", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
-    }
-#line 1633 "parser.tab.c"
-    break;
-
-  case 43: /* expr: expr TOKEN_GTE expr  */
-#line 337 "parser.y"
-    {
-        (yyval.sem).ast = ast_create_binary_op(OP_GTE, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", ">=", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
-    }
-#line 1643 "parser.tab.c"
-    break;
-
-  case 44: /* expr: expr TOKEN_ADD expr  */
-#line 343 "parser.y"
-    {
-        (yyval.sem).ast = ast_create_binary_op(OP_ADD, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "+", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "<", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
 #line 1653 "parser.tab.c"
     break;
 
-  case 45: /* expr: expr TOKEN_SUB expr  */
-#line 349 "parser.y"
+  case 41: /* expr: expr TOKEN_LTE expr  */
+#line 365 "parser.y"
     {
-        (yyval.sem).ast = ast_create_binary_op(OP_SUB, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "-", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        (yyval.sem).ast = ast_create_binary_op(OP_LTE, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "<=", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
-#line 1663 "parser.tab.c"
+#line 1665 "parser.tab.c"
     break;
 
-  case 46: /* expr: expr TOKEN_MUL expr  */
-#line 355 "parser.y"
-    {
-        (yyval.sem).ast = ast_create_binary_op(OP_MUL, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "*", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
-    }
-#line 1673 "parser.tab.c"
-    break;
-
-  case 47: /* expr: expr TOKEN_DIV expr  */
-#line 361 "parser.y"
-    {
-        (yyval.sem).ast = ast_create_binary_op(OP_DIV, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "/", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
-    }
-#line 1683 "parser.tab.c"
-    break;
-
-  case 48: /* expr: expr TOKEN_MOD expr  */
-#line 367 "parser.y"
-    {
-        (yyval.sem).ast = ast_create_binary_op(OP_MOD, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("BinaryExpr", "%", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt); pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
-    }
-#line 1693 "parser.tab.c"
-    break;
-
-  case 49: /* expr: TOKEN_SUB expr  */
+  case 42: /* expr: expr TOKEN_GT expr  */
 #line 373 "parser.y"
     {
-        (yyval.sem).ast = ast_create_unary_op(OP_NEG, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("UnaryExpr", "-", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        (yyval.sem).ast = ast_create_binary_op(OP_GT, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", ">", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
-#line 1703 "parser.tab.c"
+#line 1677 "parser.tab.c"
     break;
 
-  case 50: /* expr: TOKEN_NOT expr  */
-#line 379 "parser.y"
+  case 43: /* expr: expr TOKEN_GTE expr  */
+#line 381 "parser.y"
     {
-        (yyval.sem).ast = ast_create_unary_op(OP_NOT, (yyvsp[0].sem).ast, yylineno);
-        (yyval.sem).pt = pt_create_node("UnaryExpr", "!", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+        (yyval.sem).ast = ast_create_binary_op(OP_GTE, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", ">=", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+    }
+#line 1689 "parser.tab.c"
+    break;
+
+  case 44: /* expr: expr TOKEN_ADD expr  */
+#line 389 "parser.y"
+    {
+        (yyval.sem).ast = ast_create_binary_op(OP_ADD, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "+", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+    }
+#line 1701 "parser.tab.c"
+    break;
+
+  case 45: /* expr: expr TOKEN_SUB expr  */
+#line 397 "parser.y"
+    {
+        (yyval.sem).ast = ast_create_binary_op(OP_SUB, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "-", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
     }
 #line 1713 "parser.tab.c"
     break;
 
+  case 46: /* expr: expr TOKEN_MUL expr  */
+#line 405 "parser.y"
+    {
+        (yyval.sem).ast = ast_create_binary_op(OP_MUL, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "*", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+    }
+#line 1725 "parser.tab.c"
+    break;
+
+  case 47: /* expr: expr TOKEN_DIV expr  */
+#line 413 "parser.y"
+    {
+        (yyval.sem).ast = ast_create_binary_op(OP_DIV, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "/", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+    }
+#line 1737 "parser.tab.c"
+    break;
+
+  case 48: /* expr: expr TOKEN_MOD expr  */
+#line 421 "parser.y"
+    {
+        (yyval.sem).ast = ast_create_binary_op(OP_MOD, (yyvsp[-2].sem).ast, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ((yyvsp[-2].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-2].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "%", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+    }
+#line 1749 "parser.tab.c"
+    break;
+
+  case 49: /* expr: TOKEN_SUB expr  */
+#line 429 "parser.y"
+    {
+        (yyval.sem).ast = ast_create_unary_op(OP_NEG, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("UnaryExpr", NULL, yylineno);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "-", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+    }
+#line 1760 "parser.tab.c"
+    break;
+
+  case 50: /* expr: TOKEN_NOT expr  */
+#line 436 "parser.y"
+    {
+        (yyval.sem).ast = ast_create_unary_op(OP_NOT, (yyvsp[0].sem).ast, yylineno);
+        (yyval.sem).pt = pt_create_node("UnaryExpr", NULL, yylineno);
+        pt_add_child((yyval.sem).pt, pt_create_node("Operator", "!", yylineno));
+        if ((yyvsp[0].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[0].sem).pt);
+    }
+#line 1771 "parser.tab.c"
+    break;
+
   case 51: /* expr: TOKEN_LPAREN expr TOKEN_RPAREN  */
-#line 385 "parser.y"
+#line 443 "parser.y"
     {
         (yyval.sem).ast = (yyvsp[-1].sem).ast;
-        (yyval.sem).pt = pt_create_node("ParenExpr", "()", yylineno);
-        pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        (yyval.sem).pt = pt_create_node("ParenExpr", NULL, yylineno);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", "(", yylineno));
+        if ((yyvsp[-1].sem).pt) pt_add_child((yyval.sem).pt, (yyvsp[-1].sem).pt);
+        pt_add_child((yyval.sem).pt, pt_create_node("Punctuation", ")", yylineno));
     }
-#line 1723 "parser.tab.c"
+#line 1783 "parser.tab.c"
     break;
 
   case 52: /* expr: TOKEN_IDENTIFIER  */
-#line 391 "parser.y"
+#line 451 "parser.y"
     {
         (yyval.sem).ast = ast_create_identifier((yyvsp[0].str_val), yylineno);
         (yyval.sem).pt = pt_create_node("Identifier", (yyvsp[0].str_val), yylineno);
         free((yyvsp[0].str_val));
     }
-#line 1733 "parser.tab.c"
+#line 1793 "parser.tab.c"
     break;
 
   case 53: /* expr: TOKEN_INT_LIT  */
-#line 397 "parser.y"
+#line 457 "parser.y"
     {
         (yyval.sem).ast = ast_create_int((yyvsp[0].int_val), yylineno);
         char buf[32]; snprintf(buf, sizeof(buf), "%d", (yyvsp[0].int_val));
         (yyval.sem).pt = pt_create_node("IntLiteral", buf, yylineno);
     }
-#line 1743 "parser.tab.c"
+#line 1803 "parser.tab.c"
     break;
 
   case 54: /* expr: TOKEN_FLOAT_LIT  */
-#line 403 "parser.y"
+#line 463 "parser.y"
     {
         (yyval.sem).ast = ast_create_float((yyvsp[0].float_val), yylineno);
         char buf[32]; snprintf(buf, sizeof(buf), "%g", (yyvsp[0].float_val));
         (yyval.sem).pt = pt_create_node("FloatLiteral", buf, yylineno);
     }
-#line 1753 "parser.tab.c"
+#line 1813 "parser.tab.c"
     break;
 
   case 55: /* expr: TOKEN_STRING_LIT  */
-#line 409 "parser.y"
+#line 469 "parser.y"
     {
         (yyval.sem).ast = ast_create_string((yyvsp[0].str_val), yylineno);
         (yyval.sem).pt = pt_create_node("StringLiteral", (yyvsp[0].str_val), yylineno);
         free((yyvsp[0].str_val));
     }
-#line 1763 "parser.tab.c"
+#line 1823 "parser.tab.c"
     break;
 
   case 56: /* expr: TOKEN_TRUE  */
-#line 415 "parser.y"
+#line 475 "parser.y"
     {
         (yyval.sem).ast = ast_create_bool(1, yylineno);
         (yyval.sem).pt = pt_create_node("BoolLiteral", "true", yylineno);
     }
-#line 1772 "parser.tab.c"
+#line 1832 "parser.tab.c"
     break;
 
   case 57: /* expr: TOKEN_FALSE  */
-#line 420 "parser.y"
+#line 480 "parser.y"
     {
         (yyval.sem).ast = ast_create_bool(0, yylineno);
         (yyval.sem).pt = pt_create_node("BoolLiteral", "false", yylineno);
     }
-#line 1781 "parser.tab.c"
+#line 1841 "parser.tab.c"
     break;
 
 
-#line 1785 "parser.tab.c"
+#line 1845 "parser.tab.c"
 
       default: break;
     }
@@ -1974,7 +2034,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 426 "parser.y"
+#line 486 "parser.y"
 
 
 void yyerror(const char *s) {

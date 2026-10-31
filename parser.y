@@ -84,8 +84,11 @@ stmt_list:
     stmt_list stmt
     {
         $$.ast = ast_append_stmt($1.ast, $2.ast);
-        $$.pt = pt_create_node("StmtList", NULL, yylineno);
-        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        if ($1.pt) {
+            $$.pt = $1.pt;
+        } else {
+            $$.pt = pt_create_node("StmtList", NULL, yylineno);
+        }
         if ($2.pt) pt_add_child($$.pt, $2.pt);
     }
     | stmt
@@ -145,19 +148,21 @@ var_decl:
     type_spec TOKEN_IDENTIFIER TOKEN_SEMICOLON
     {
         $$.ast = ast_create_var_decl($1.data_type, $2, NULL, yylineno);
-        $$.pt = pt_create_node("VarDecl", $2, yylineno);
-        pt_add_child($$.pt, $1.pt);
+        $$.pt = pt_create_node("VarDecl", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
         pt_add_child($$.pt, pt_create_node("Identifier", $2, yylineno));
+        pt_add_child($$.pt, pt_create_node("Punctuation", ";", yylineno));
         free($2);
     }
     | type_spec TOKEN_IDENTIFIER TOKEN_ASSIGN expr TOKEN_SEMICOLON
     {
         $$.ast = ast_create_var_decl($1.data_type, $2, $4.ast, yylineno);
-        $$.pt = pt_create_node("VarDeclInit", $2, yylineno);
-        pt_add_child($$.pt, $1.pt);
+        $$.pt = pt_create_node("VarDeclInit", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
         pt_add_child($$.pt, pt_create_node("Identifier", $2, yylineno));
         pt_add_child($$.pt, pt_create_node("AssignOp", "=", yylineno));
-        pt_add_child($$.pt, $4.pt);
+        if ($4.pt) pt_add_child($$.pt, $4.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", ";", yylineno));
         free($2);
     }
     ;
@@ -166,10 +171,11 @@ assign_stmt:
     TOKEN_IDENTIFIER TOKEN_ASSIGN expr TOKEN_SEMICOLON
     {
         $$.ast = ast_create_assign($1, $3.ast, yylineno);
-        $$.pt = pt_create_node("AssignStmt", $1, yylineno);
+        $$.pt = pt_create_node("AssignStmt", NULL, yylineno);
         pt_add_child($$.pt, pt_create_node("Identifier", $1, yylineno));
         pt_add_child($$.pt, pt_create_node("AssignOp", "=", yylineno));
-        pt_add_child($$.pt, $3.pt);
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", ";", yylineno));
         free($1);
     }
     ;
@@ -179,16 +185,23 @@ if_stmt:
     {
         $$.ast = ast_create_if($3.ast, $5.ast, NULL, yylineno);
         $$.pt = pt_create_node("IfStmt", NULL, yylineno);
-        pt_add_child($$.pt, $3.pt);
-        pt_add_child($$.pt, $5.pt);
+        pt_add_child($$.pt, pt_create_node("Keyword", "if", yylineno));
+        pt_add_child($$.pt, pt_create_node("Punctuation", "(", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", ")", yylineno));
+        if ($5.pt) pt_add_child($$.pt, $5.pt);
     }
     | TOKEN_IF TOKEN_LPAREN expr TOKEN_RPAREN stmt TOKEN_ELSE stmt
     {
         $$.ast = ast_create_if($3.ast, $5.ast, $7.ast, yylineno);
         $$.pt = pt_create_node("IfElseStmt", NULL, yylineno);
-        pt_add_child($$.pt, $3.pt);
-        pt_add_child($$.pt, $5.pt);
-        pt_add_child($$.pt, $7.pt);
+        pt_add_child($$.pt, pt_create_node("Keyword", "if", yylineno));
+        pt_add_child($$.pt, pt_create_node("Punctuation", "(", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", ")", yylineno));
+        if ($5.pt) pt_add_child($$.pt, $5.pt);
+        pt_add_child($$.pt, pt_create_node("Keyword", "else", yylineno));
+        if ($7.pt) pt_add_child($$.pt, $7.pt);
     }
     ;
 
@@ -197,8 +210,11 @@ while_stmt:
     {
         $$.ast = ast_create_while($3.ast, $5.ast, yylineno);
         $$.pt = pt_create_node("WhileStmt", NULL, yylineno);
-        pt_add_child($$.pt, $3.pt);
-        pt_add_child($$.pt, $5.pt);
+        pt_add_child($$.pt, pt_create_node("Keyword", "while", yylineno));
+        pt_add_child($$.pt, pt_create_node("Punctuation", "(", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", ")", yylineno));
+        if ($5.pt) pt_add_child($$.pt, $5.pt);
     }
     ;
 
@@ -207,9 +223,14 @@ for_stmt:
     {
         $$.ast = ast_create_for($3.ast, $5.ast, $7.ast, $9.ast, yylineno);
         $$.pt = pt_create_node("ForStmt", NULL, yylineno);
+        pt_add_child($$.pt, pt_create_node("Keyword", "for", yylineno));
+        pt_add_child($$.pt, pt_create_node("Punctuation", "(", yylineno));
         if ($3.pt) pt_add_child($$.pt, $3.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", ";", yylineno));
         if ($5.pt) pt_add_child($$.pt, $5.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", ";", yylineno));
         if ($7.pt) pt_add_child($$.pt, $7.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", ")", yylineno));
         if ($9.pt) pt_add_child($$.pt, $9.pt);
     }
     ;
@@ -223,18 +244,20 @@ opt_for_init:
     | type_spec TOKEN_IDENTIFIER TOKEN_ASSIGN expr
     {
         $$.ast = ast_create_var_decl($1.data_type, $2, $4.ast, yylineno);
-        $$.pt = pt_create_node("ForInitDecl", $2, yylineno);
-        pt_add_child($$.pt, $1.pt);
+        $$.pt = pt_create_node("ForInitDecl", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
         pt_add_child($$.pt, pt_create_node("Identifier", $2, yylineno));
-        pt_add_child($$.pt, $4.pt);
+        pt_add_child($$.pt, pt_create_node("AssignOp", "=", yylineno));
+        if ($4.pt) pt_add_child($$.pt, $4.pt);
         free($2);
     }
     | TOKEN_IDENTIFIER TOKEN_ASSIGN expr
     {
         $$.ast = ast_create_assign($1, $3.ast, yylineno);
-        $$.pt = pt_create_node("ForInitAssign", $1, yylineno);
+        $$.pt = pt_create_node("ForInitAssign", NULL, yylineno);
         pt_add_child($$.pt, pt_create_node("Identifier", $1, yylineno));
-        pt_add_child($$.pt, $3.pt);
+        pt_add_child($$.pt, pt_create_node("AssignOp", "=", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
         free($1);
     }
     ;
@@ -260,9 +283,10 @@ opt_for_update:
     | TOKEN_IDENTIFIER TOKEN_ASSIGN expr
     {
         $$.ast = ast_create_assign($1, $3.ast, yylineno);
-        $$.pt = pt_create_node("ForUpdateAssign", $1, yylineno);
+        $$.pt = pt_create_node("ForUpdateAssign", NULL, yylineno);
         pt_add_child($$.pt, pt_create_node("Identifier", $1, yylineno));
-        pt_add_child($$.pt, $3.pt);
+        pt_add_child($$.pt, pt_create_node("AssignOp", "=", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
         free($1);
     }
     ;
@@ -272,7 +296,9 @@ print_stmt:
     {
         $$.ast = ast_create_print($2.ast, yylineno);
         $$.pt = pt_create_node("PrintStmt", NULL, yylineno);
-        pt_add_child($$.pt, $2.pt);
+        pt_add_child($$.pt, pt_create_node("Keyword", "print", yylineno));
+        if ($2.pt) pt_add_child($$.pt, $2.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", ";", yylineno));
     }
     ;
 
@@ -281,12 +307,16 @@ block:
     {
         $$.ast = ast_create_block($2.ast, yylineno);
         $$.pt = pt_create_node("Block", NULL, yylineno);
-        pt_add_child($$.pt, $2.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", "{", yylineno));
+        if ($2.pt) pt_add_child($$.pt, $2.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", "}", yylineno));
     }
     | TOKEN_LBRACE TOKEN_RBRACE
     {
         $$.ast = ast_create_block(NULL, yylineno);
-        $$.pt = pt_create_node("EmptyBlock", "{}", yylineno);
+        $$.pt = pt_create_node("Block", NULL, yylineno);
+        pt_add_child($$.pt, pt_create_node("Punctuation", "{", yylineno));
+        pt_add_child($$.pt, pt_create_node("Punctuation", "}", yylineno));
     }
     ;
 
@@ -294,98 +324,128 @@ expr:
     expr TOKEN_OR expr
     {
         $$.ast = ast_create_binary_op(OP_OR, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "||", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "||", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_AND expr
     {
         $$.ast = ast_create_binary_op(OP_AND, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "&&", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "&&", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_EQ expr
     {
         $$.ast = ast_create_binary_op(OP_EQ, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "==", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "==", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_NEQ expr
     {
         $$.ast = ast_create_binary_op(OP_NEQ, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "!=", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "!=", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_LT expr
     {
         $$.ast = ast_create_binary_op(OP_LT, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "<", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "<", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_LTE expr
     {
         $$.ast = ast_create_binary_op(OP_LTE, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "<=", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "<=", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_GT expr
     {
         $$.ast = ast_create_binary_op(OP_GT, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", ">", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", ">", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_GTE expr
     {
         $$.ast = ast_create_binary_op(OP_GTE, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", ">=", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", ">=", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_ADD expr
     {
         $$.ast = ast_create_binary_op(OP_ADD, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "+", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "+", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_SUB expr
     {
         $$.ast = ast_create_binary_op(OP_SUB, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "-", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "-", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_MUL expr
     {
         $$.ast = ast_create_binary_op(OP_MUL, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "*", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "*", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_DIV expr
     {
         $$.ast = ast_create_binary_op(OP_DIV, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "/", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "/", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | expr TOKEN_MOD expr
     {
         $$.ast = ast_create_binary_op(OP_MOD, $1.ast, $3.ast, yylineno);
-        $$.pt = pt_create_node("BinaryExpr", "%", yylineno);
-        pt_add_child($$.pt, $1.pt); pt_add_child($$.pt, $3.pt);
+        $$.pt = pt_create_node("BinaryExpr", NULL, yylineno);
+        if ($1.pt) pt_add_child($$.pt, $1.pt);
+        pt_add_child($$.pt, pt_create_node("Operator", "%", yylineno));
+        if ($3.pt) pt_add_child($$.pt, $3.pt);
     }
     | TOKEN_SUB expr %prec UMINUS
     {
         $$.ast = ast_create_unary_op(OP_NEG, $2.ast, yylineno);
-        $$.pt = pt_create_node("UnaryExpr", "-", yylineno);
-        pt_add_child($$.pt, $2.pt);
+        $$.pt = pt_create_node("UnaryExpr", NULL, yylineno);
+        pt_add_child($$.pt, pt_create_node("Operator", "-", yylineno));
+        if ($2.pt) pt_add_child($$.pt, $2.pt);
     }
     | TOKEN_NOT expr
     {
         $$.ast = ast_create_unary_op(OP_NOT, $2.ast, yylineno);
-        $$.pt = pt_create_node("UnaryExpr", "!", yylineno);
-        pt_add_child($$.pt, $2.pt);
+        $$.pt = pt_create_node("UnaryExpr", NULL, yylineno);
+        pt_add_child($$.pt, pt_create_node("Operator", "!", yylineno));
+        if ($2.pt) pt_add_child($$.pt, $2.pt);
     }
     | TOKEN_LPAREN expr TOKEN_RPAREN
     {
         $$.ast = $2.ast;
-        $$.pt = pt_create_node("ParenExpr", "()", yylineno);
-        pt_add_child($$.pt, $2.pt);
+        $$.pt = pt_create_node("ParenExpr", NULL, yylineno);
+        pt_add_child($$.pt, pt_create_node("Punctuation", "(", yylineno));
+        if ($2.pt) pt_add_child($$.pt, $2.pt);
+        pt_add_child($$.pt, pt_create_node("Punctuation", ")", yylineno));
     }
     | TOKEN_IDENTIFIER
     {

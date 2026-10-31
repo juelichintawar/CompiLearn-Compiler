@@ -821,6 +821,88 @@ body {
   white-space: pre;
 }
 
+/* Tree Visualizer Syntax Styling */
+.tree-pre {
+  line-height: 22px;
+  font-size: 13px;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.tree-status-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  user-select: none;
+}
+
+.tree-branch {
+  color: #64748b;
+  user-select: none;
+  font-weight: 500;
+}
+
+[data-theme="light"] .tree-branch {
+  color: #94a3b8;
+}
+
+.tree-tag {
+  font-weight: 600;
+}
+
+.tree-nonterminal {
+  color: #34d399; /* Emerald Green */
+}
+
+[data-theme="light"] .tree-nonterminal {
+  color: #059669;
+}
+
+.tree-terminal {
+  color: #38bdf8; /* Sky Blue */
+}
+
+[data-theme="light"] .tree-terminal {
+  color: #0284c7;
+}
+
+.tree-colon {
+  color: var(--text-secondary);
+}
+
+.tree-value {
+  color: #fbbf24; /* Amber */
+  font-weight: 500;
+}
+
+[data-theme="light"] .tree-value {
+  color: #d97706;
+}
+
+.tree-line {
+  color: #a78bfa; /* Purple */
+  font-size: 11px;
+}
+
+[data-theme="light"] .tree-line {
+  color: #7c3aed;
+}
+
+.tree-role {
+  color: #f43f5e; /* Rose */
+  font-weight: 600;
+}
+
+[data-theme="light"] .tree-role {
+  color: #e11d48;
+}
+
 .terminal-pre {
   background-color: #0b0f14;
   color: #38bdf8;

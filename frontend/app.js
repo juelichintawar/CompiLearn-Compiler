@@ -499,10 +499,10 @@
       // Populate raw or specific view
       if (phase === 'tokens') {
         el.rawCliConsole.textContent = output;
-      } else if (phase === 'tree') {
-        el.parseTreeOutput.textContent = output;
+      } else if (phase === 'tree' || phase === 'parse') {
+        renderParseTree(output);
       } else if (phase === 'ast') {
-        el.astOutput.textContent = output;
+        renderAst(output);
       } else if (phase === 'tac') {
         el.tacOutput.textContent = output;
       } else if (phase === 'optimize') {
@@ -557,10 +557,10 @@
     renderTokensTable(data.tokens || []);
 
     // 3. Parse Tree
-    el.parseTreeOutput.textContent = full.parse_tree || '(Not available)';
+    renderParseTree(full.parse_tree || '(Not available)');
 
     // 4. AST
-    el.astOutput.textContent = full.ast || '(Not available)';
+    renderAst(full.ast || '(Not available)');
 
     // 5. Symbols Table
     renderSymbolsTable(data.symbols || []);
@@ -712,6 +712,135 @@
     }
 
     el.semanticReportContainer.innerHTML = errsHtml;
+  }
+
+  // --- Render Concrete Parse Tree with Syntax Highlighting ---
+  function renderParseTree(rawText) {
+    if (!rawText || !rawText.trim() || rawText.includes('(Not available)')) {
+      el.parseTreeOutput.innerHTML = '<div class="empty-state">Parse tree not generated yet. Click \'Compile All\' or select \'tree\' phase.</div>';
+      return;
+    }
+
+    const lines = rawText.split('\n');
+    let statusHeader = '';
+    let treeLines = [];
+    let insideTree = false;
+
+    if (rawText.includes('PARSING SUCCESSFUL')) {
+      statusHeader = '<div class="tree-status-header"><span class="badge badge-success">✓ Syntax Analysis: Successful (0 Syntax Errors)</span></div>';
+    } else if (rawText.includes('PARSING FAILED')) {
+      statusHeader = '<div class="tree-status-header"><span class="badge badge-danger">✗ Syntax Analysis: Parsing Failed</span></div>';
+    }
+
+    const nonTerminals = new Set([
+      'Program', 'StmtList', 'Stmt', 'VarDecl', 'VarDeclInit', 'AssignStmt',
+      'IfStmt', 'IfElseStmt', 'WhileStmt', 'ForStmt', 'ForInitDecl',
+      'ForInitAssign', 'ForUpdateAssign', 'PrintStmt', 'Block', 'EmptyBlock',
+      'BinaryExpr', 'UnaryExpr', 'ParenExpr', 'EmptyStmt', 'SyntaxError'
+    ]);
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.includes('└──') || line.includes('├──') || (insideTree && line.trim())) {
+        if (line.trim().startsWith('=====')) {
+          if (treeLines.length > 0) break;
+          continue;
+        }
+        insideTree = true;
+        treeLines.push(line);
+      }
+    }
+
+    if (treeLines.length === 0) {
+      el.parseTreeOutput.textContent = rawText;
+      return;
+    }
+
+    const treeRegex = /^([\s│├└─|+\\/\-]+)?<([a-zA-Z0-9_]+)>(?::\s*("(?:[^"\\]|\\.)*"|[^()\n]+?))?(?:\s*\((line\s+\d+)\))?$/;
+
+    let formattedHtml = statusHeader;
+    treeLines.forEach(line => {
+      const m = line.match(treeRegex);
+      if (m) {
+        const prefix = m[1] || '';
+        const tag = m[2];
+        const val = m[3] || '';
+        const lineMeta = m[4] || '';
+
+        const isNonTerm = nonTerminals.has(tag);
+        const tagClass = isNonTerm ? 'tree-tag tree-nonterminal' : 'tree-tag tree-terminal';
+
+        let lineHtml = `<span class="tree-branch">${escapeHtml(prefix)}</span>`;
+        lineHtml += `<span class="${tagClass}">&lt;${escapeHtml(tag)}&gt;</span>`;
+        if (val) {
+          lineHtml += `<span class="tree-colon">: </span><span class="tree-value">${escapeHtml(val)}</span>`;
+        }
+        if (lineMeta) {
+          lineHtml += ` <span class="tree-line">(${escapeHtml(lineMeta)})</span>`;
+        }
+        formattedHtml += lineHtml + '\n';
+      } else {
+        formattedHtml += escapeHtml(line) + '\n';
+      }
+    });
+
+    el.parseTreeOutput.innerHTML = formattedHtml;
+  }
+
+  // --- Render Abstract Syntax Tree (AST) with Styling ---
+  function renderAst(rawText) {
+    if (!rawText || !rawText.trim() || rawText.includes('(Not available)')) {
+      el.astOutput.innerHTML = '<div class="empty-state">AST not generated yet. Click \'Compile All\'.</div>';
+      return;
+    }
+
+    const lines = rawText.split('\n');
+    let treeLines = [];
+    let insideTree = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.includes('└──') || line.includes('├──') || (insideTree && line.trim())) {
+        if (line.trim().startsWith('=====')) {
+          if (treeLines.length > 0) break;
+          continue;
+        }
+        insideTree = true;
+        treeLines.push(line);
+      }
+    }
+
+    if (treeLines.length === 0) {
+      el.astOutput.textContent = rawText;
+      return;
+    }
+
+    const astRegex = /^([\s│├└─|+\\/\-]+)?(?:(\[[a-zA-Z0-9_]+\])\s+)?(.*)$/;
+
+    let formattedHtml = '';
+    treeLines.forEach(line => {
+      const m = line.match(astRegex);
+      if (m) {
+        const prefix = m[1] || '';
+        const role = m[2] || '';
+        const rest = m[3] || '';
+
+        let lineHtml = `<span class="tree-branch">${escapeHtml(prefix)}</span>`;
+        if (role) {
+          lineHtml += `<span class="tree-role">${escapeHtml(role)}</span> `;
+        }
+        let restHtml = escapeHtml(rest)
+          .replace(/\((line\s+\d+[^)]*)\)/g, '<span class="tree-line">($1)</span>')
+          .replace(/(: (?:int|float|string|bool)[^ \n(]*)/g, '<span class="tree-value">$1</span>');
+
+        lineHtml += restHtml;
+        formattedHtml += lineHtml + '\n';
+      } else {
+        formattedHtml += escapeHtml(line) + '\n';
+      }
+    });
+
+    el.astOutput.innerHTML = formattedHtml;
   }
 
   // --- Helpers ---
